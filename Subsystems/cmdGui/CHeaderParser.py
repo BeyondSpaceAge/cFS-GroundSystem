@@ -73,7 +73,7 @@ def find_data_type_new(data_type_orig, param_name):
     if data_type_orig in ['boolean']:
         return '--uint8'
     if data_type_orig in ['int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64']:
-        return "--" + data_type_orig
+        return f"--{data_type_orig}"
     return None
 
 
@@ -131,9 +131,7 @@ if __name__ == '__main__':
         # open header file as single header
         with open(hdr_file) as single_hdr:
             # dump single header into master
-            for single_line in single_hdr:
-                master_hdr.append(single_line)
-
+            master_hdr.extend(iter(single_hdr))
     # Reads and saves command and parameter information
     # Look through each line of the header file for command definitions
     for single_line in master_hdr:

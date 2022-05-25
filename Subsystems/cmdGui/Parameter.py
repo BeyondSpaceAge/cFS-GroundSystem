@@ -64,8 +64,7 @@ class Parameter(QDialog, UiDialog):
         param_string = ' '.join(param_list)
         self.mcu = MiniCmdUtil(pageAddress, pagePort, pageEndian, pagePktId,
                                cmdCode, param_string.strip())
-        sendSuccess = self.mcu.send_packet()
-        if sendSuccess:
+        if sendSuccess := self.mcu.send_packet():
             self.status_box.setText('Command sent!')
         else:
             self.status_box.setText('Error occurred')

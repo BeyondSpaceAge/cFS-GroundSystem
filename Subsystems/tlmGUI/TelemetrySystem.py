@@ -54,9 +54,7 @@ class TelemetrySystem(QDialog, UiTelemetrysystemdialog):
     #
     @staticmethod
     def str_to_hex(a_string):
-        hex_str = ""
-        for x in a_string:
-            hex_str += f'{ord(x):02X} '
+        hex_str = "".join(f'{ord(x):02X} ' for x in a_string)
         return hex_str.strip()
 
     #

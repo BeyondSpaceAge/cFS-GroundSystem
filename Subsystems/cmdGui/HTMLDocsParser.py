@@ -111,12 +111,13 @@ if __name__ == '__main__':
                 # iterates through lines between Data Fields and Detailed Description
                 while i < j:
                     # skips header parameters
-                    if any([x in all_data[i + 1] for x in ('Header', 'Hdr')]):
+                    if any(x in all_data[i + 1] for x in ('Header', 'Hdr')):
                         # if 'Header' in data[i + 1] or 'Hdr' in data[i + 1]:
                         i += 1
-                        while not any(
-                            [x in all_data[i]
-                             for x in ('uint', 'char')]) and i < j:
+                        while (
+                            all(x not in all_data[i] for x in ('uint', 'char'))
+                            and i < j
+                        ):
                             # while 'uint' not in data[i] and 'char' not in data[
                             #         i] and i < j:
                             i += 1
@@ -133,7 +134,10 @@ if __name__ == '__main__':
                             i += 1
                         param_len.append(param_len)
                         desc_string = ''
-                        while not any([x in all_data[i] for x in ('uint', 'char')]) and i < j:
+                        while (
+                            all(x not in all_data[i] for x in ('uint', 'char'))
+                            and i < j
+                        ):
                             desc_string = f'{desc_string} {all_data[i]}'
                             i += 1
                         param_desc.append(desc_string.lstrip()
@@ -170,7 +174,7 @@ if __name__ == '__main__':
 
             # write data to a file
             file_split = re.split(r'/|\.', html_file)
-            pickle_file = 'ParameterFiles/' + file_split[-2]
+            pickle_file = f'ParameterFiles/{file_split[-2]}'
             with open(pickle_file, 'wb') as pickle_obj:
                 pickle.dump([
                     data_types_orig, param_names, param_len, param_desc,
