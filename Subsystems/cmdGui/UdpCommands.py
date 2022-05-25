@@ -178,10 +178,7 @@ if __name__ == '__main__':
     with open(pickle_file, 'rb') as pickle_obj:
         cmd_desc, cmd_codes, param_files = pickle.load(pickle_obj)
 
-    cmd_item_is_valid = []
-    for i in range(len(cmd_desc)):
-        cmd_item_is_valid.append(True)
-
+    cmd_item_is_valid = [True for _ in range(len(cmd_desc))]
     #
     # Fill the data fields on the page
     #

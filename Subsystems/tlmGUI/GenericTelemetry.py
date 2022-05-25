@@ -49,37 +49,38 @@ class SubsystemTelemetry(QDialog, UiGenerictelemetrydialog):
     # This method decodes a telemetry item from the packet and displays it
     #
     def display_telemetry_item(self, datagram, tlm_index, label_field, value_field):
-        if tlm_item_is_valid[tlm_index]:
-            tlm_offset = 0
-            try:
-                tlm_offset = self.mm[0]
-            except ValueError:
-                pass
+        if not tlm_item_is_valid[tlm_index]:
+            return
+        tlm_offset = 0
+        try:
+            tlm_offset = self.mm[0]
+        except ValueError:
+            pass
 
-            tlm_field1 = tlm_item_format[tlm_index]
-            if tlm_field1[0] == "<":
-                tlm_field1 = tlm_field1[1:]
-        
-            item_start = 0
-            try:
-                item_start = int(tlm_item_start[tlm_index]) + tlm_offset
-            except UnboundLocalError:
-                pass
-            tlm_field2 = datagram[item_start:item_start +
-                                 int(tlmItemSize[tlm_index])]
-            if tlm_field2:
-                tlm_field = unpack(tlm_field1, tlm_field2)
-                if tlm_item_display_type[tlm_index] == 'Dec':
-                    value_field.setText(str(tlm_field[0]))
-                elif tlm_item_display_type[tlm_index] == 'Hex':
-                    value_field.setText(hex(tlm_field[0]))
-                elif tlm_item_display_type[tlm_index] == 'Enm':
-                    value_field.setText(tlmItemEnum[tlm_index][int(tlm_field[0])])
-                elif tlm_item_display_type[tlm_index] == 'Str':
-                    value_field.setText(tlm_field[0].decode('utf-8', 'ignore'))
-                label_field.setText(tlmItemDesc[tlm_index])
-            else:
-                print("ERROR: Can't unpack buffer of length", len(tlm_field2))
+        tlm_field1 = tlm_item_format[tlm_index]
+        if tlm_field1[0] == "<":
+            tlm_field1 = tlm_field1[1:]
+
+        item_start = 0
+        try:
+            item_start = int(tlm_item_start[tlm_index]) + tlm_offset
+        except UnboundLocalError:
+            pass
+        if tlm_field2 := datagram[
+            item_start : item_start + int(tlmItemSize[tlm_index])
+        ]:
+            tlm_field = unpack(tlm_field1, tlm_field2)
+            if tlm_item_display_type[tlm_index] == 'Dec':
+                value_field.setText(str(tlm_field[0]))
+            elif tlm_item_display_type[tlm_index] == 'Hex':
+                value_field.setText(hex(tlm_field[0]))
+            elif tlm_item_display_type[tlm_index] == 'Enm':
+                value_field.setText(tlmItemEnum[tlm_index][int(tlm_field[0])])
+            elif tlm_item_display_type[tlm_index] == 'Str':
+                value_field.setText(tlm_field[0].decode('utf-8', 'ignore'))
+            label_field.setText(tlmItemDesc[tlm_index])
+        else:
+            print("ERROR: Can't unpack buffer of length", len(tlm_field2))
 
     # Start the telemetry receiver (see GTTlmReceiver class)
     def init_gt_tlm_receiver(self, subscr):

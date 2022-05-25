@@ -81,39 +81,40 @@ class MiniCmdUtil:
         return ccsds_pri
 
     def assemble_payload(self):
-        if self.parameters:
-            param_list = self.parameters.split(" ")
-            for param in param_list:
-                items = param.split("=")  # e.g. ["--uint16", "2"]
-                if "--string" not in param:  # non-string param
-                    data_type = items[0].strip("-")  # Remove "--" prefix
-                    data_val = int(items[1])
-                    for key in self.dataTypes:  # Loop thru dictionary keys
-                        if data_type in key:  # Check if e.g. "uint16" in key tuple
-                            # Get the TypeSignature tuple
-                            type_sig = self.dataTypes[key]
-                            break  # Stop checking dictionary
-                    # If TypeSignature endian is None, get the
-                    # user-provided/default endian. Otherwise get
-                    # the TypeSignature endian
-                    endian = type_sig.endian or self.endian
-                    # Convert to bytes of correct length, endianess, and sign
-                    data_val_b = data_val.to_bytes(type_sig.byteLen,
-                                                   byteorder=endian,
-                                                   signed=type_sig.signed)
-                    # Add data to payload bytearray
-                    self.payload.extend(data_val_b)
-                else:
-                    string_params = items[1].strip("\"").split(
-                        ":")  # e.g. ["16", "ES_APP"]
-                    # Zero init'd bytearray of length e.g. 16
-                    fixed_len_str = bytearray(int(string_params[0]))
-                    string_b = string_params[1].encode(
-                    )  # Param string to bytes
-                    # Insert param bytes into front of bytearray
-                    fixed_len_str[:len(string_b)] = string_b
-                    # Add data to payload bytearray
-                    self.payload.extend(fixed_len_str)
+        if not self.parameters:
+            return
+        param_list = self.parameters.split(" ")
+        for param in param_list:
+            items = param.split("=")  # e.g. ["--uint16", "2"]
+            if "--string" not in param:  # non-string param
+                data_type = items[0].strip("-")  # Remove "--" prefix
+                data_val = int(items[1])
+                for key in self.dataTypes:  # Loop thru dictionary keys
+                    if data_type in key:  # Check if e.g. "uint16" in key tuple
+                        # Get the TypeSignature tuple
+                        type_sig = self.dataTypes[key]
+                        break  # Stop checking dictionary
+                # If TypeSignature endian is None, get the
+                # user-provided/default endian. Otherwise get
+                # the TypeSignature endian
+                endian = type_sig.endian or self.endian
+                # Convert to bytes of correct length, endianess, and sign
+                data_val_b = data_val.to_bytes(type_sig.byteLen,
+                                               byteorder=endian,
+                                               signed=type_sig.signed)
+                # Add data to payload bytearray
+                self.payload.extend(data_val_b)
+            else:
+                string_params = items[1].strip("\"").split(
+                    ":")  # e.g. ["16", "ES_APP"]
+                # Zero init'd bytearray of length e.g. 16
+                fixed_len_str = bytearray(int(string_params[0]))
+                string_b = string_params[1].encode(
+                )  # Param string to bytes
+                # Insert param bytes into front of bytearray
+                fixed_len_str[:len(string_b)] = string_b
+                # Add data to payload bytearray
+                self.payload.extend(fixed_len_str)
 
     def assemble_packet(self):
         self._get_offsets()
